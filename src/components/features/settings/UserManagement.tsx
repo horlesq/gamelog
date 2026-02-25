@@ -149,7 +149,7 @@ export default function UserManagement({ currentUser }: UserManagementProps) {
                             <span>Create User</span>
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="border-2 border-secondary/50">
+                    <DialogContent className="border-2 border-border/50">
                         <DialogHeader>
                             <DialogTitle>Create New User</DialogTitle>
                             <DialogDescription>

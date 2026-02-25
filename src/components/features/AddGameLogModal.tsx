@@ -265,7 +265,7 @@ export default function AddGameLogModal({
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto border-2 border-secondary/50">
+            <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto border-2 border-border/50">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Image
