@@ -153,7 +153,8 @@ const Navbar = forwardRef<NavbarRef, NavbarProps>(({ onAddGame }, ref) => {
                                         onAddGame?.();
                                         setMobileMenuOpen(false);
                                     }}
-                                    className="w-full flex items-center justify-start space-x-2 bg-secondary hover:bg-primary/80 text-white font-semibold"
+                                    variant="default"
+                                    className="w-full justify-start"
                                 >
                                     <Plus className="size-4" />
                                     <span>Add Game</span>
@@ -164,7 +165,8 @@ const Navbar = forwardRef<NavbarRef, NavbarProps>(({ onAddGame }, ref) => {
                                         router.push("/dashboard");
                                         setMobileMenuOpen(false);
                                     }}
-                                    className="w-full flex items-center justify-start space-x-2 bg-secondary hover:bg-primary/80 text-white font-semibold"
+                                    variant="default"
+                                    className="w-full justify-start"
                                 >
                                     <LayoutDashboard className="size-4" />
                                     <span>Dashboard</span>
@@ -177,7 +179,7 @@ const Navbar = forwardRef<NavbarRef, NavbarProps>(({ onAddGame }, ref) => {
                                     handleSettingsClick();
                                     setMobileMenuOpen(false);
                                 }}
-                                className="w-full flex items-center justify-start space-x-2 relative border-white/10 bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-foreground"
+                                className="w-full justify-start"
                             >
                                 <Settings className="size-4" />
                                 <span>Settings</span>
@@ -192,7 +194,7 @@ const Navbar = forwardRef<NavbarRef, NavbarProps>(({ onAddGame }, ref) => {
                                     handleLogout();
                                     setMobileMenuOpen(false);
                                 }}
-                                className="w-full flex items-center justify-start space-x-2 border-white/10 bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-foreground"
+                                className="w-full justify-start"
                             >
                                 <LogOut className="size-4" />
                                 <span>Logout</span>

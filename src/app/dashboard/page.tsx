@@ -6,7 +6,7 @@ import StatsOverview from "@/components/features/StatsOverview";
 import DashboardControls from "@/components/features/DashboardControls";
 import EmptyState from "@/components/features/EmptyState";
 import { SortOption } from "@/lib/constants";
-import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import Navbar, { NavbarRef } from "@/components/layout/Navbar";
 import GameCard from "@/components/features/GameCard";
 import GameList from "@/components/features/GameList";
@@ -113,13 +113,37 @@ export default function DashboardPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-background">
-                <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-                    <p className="text-muted-foreground">
-                        Loading your library...
-                    </p>
-                </div>
+            <div className="min-h-screen bg-background">
+                <Navbar ref={navbarRef} onAddGame={handleAddClick} />
+
+                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                    {/* Skeleton Stats */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <Skeleton
+                                key={i}
+                                className="h-20 sm:h-24 rounded-2xl"
+                            />
+                        ))}
+                    </div>
+
+                    {/* Skeleton Controls */}
+                    <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                        <Skeleton className="h-10 flex-1 rounded-lg" />
+                        <div className="flex gap-2">
+                            <Skeleton className="h-10 w-10 rounded-lg" />
+                            <Skeleton className="h-10 w-10 rounded-lg" />
+                            <Skeleton className="h-10 w-10 rounded-lg" />
+                        </div>
+                    </div>
+
+                    {/* Skeleton Game Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                        {Array.from({ length: 8 }).map((_, i) => (
+                            <Skeleton key={i} className="h-72 rounded-2xl" />
+                        ))}
+                    </div>
+                </main>
             </div>
         );
     }

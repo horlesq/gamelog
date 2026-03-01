@@ -10,6 +10,7 @@ import { getCurrentUser } from "@/lib/auth/client";
 import ProfileSettings from "@/components/features/settings/ProfileSettings";
 import UserManagement from "@/components/features/settings/UserManagement";
 import VersionSettings from "@/components/features/settings/VersionSettings";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState("profile");
@@ -39,8 +40,47 @@ export default function SettingsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div>Loading...</div>
+            <div className="min-h-screen bg-background">
+                <Navbar />
+
+                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <div className="mb-6 sm:mb-8">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                            Settings
+                        </h1>
+                        <p className="text-muted-foreground mt-2">
+                            Manage your profile and system settings
+                        </p>
+                    </div>
+
+                    <div className="space-y-6">
+                        {/* Skeleton Tab Bar */}
+                        <Skeleton className="h-10 w-24 rounded-lg" />
+
+                        {/* Skeleton Form */}
+                        <div className="rounded-2xl border border-border/40 bg-card/40 p-6 space-y-6">
+                            <div className="space-y-2">
+                                <Skeleton className="h-5 w-32 rounded-md" />
+                                <Skeleton className="h-4 w-56 rounded-md" />
+                            </div>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-28 rounded-md" />
+                                    <Skeleton className="h-10 w-full max-w-sm rounded-lg" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-16 rounded-md" />
+                                    <Skeleton className="h-10 w-full max-w-sm rounded-lg" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-40 rounded-md" />
+                                    <Skeleton className="h-10 w-full max-w-sm rounded-lg" />
+                                </div>
+                                <Skeleton className="h-10 w-32 rounded-lg" />
+                            </div>
+                        </div>
+                    </div>
+                </main>
             </div>
         );
     }
