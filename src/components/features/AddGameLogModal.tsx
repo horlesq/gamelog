@@ -431,7 +431,19 @@ export default function AddGameLogModal({
                                 {STATUS_OPTIONS.map((opt) => (
                                     <button
                                         key={opt.value}
-                                        onClick={() => setStatus(opt.value)}
+                                        onClick={() => {
+                                            setStatus(opt.value);
+                                            // Clear fields that don't apply to the new status
+                                            if (opt.value === "PLAN_TO_PLAY") {
+                                                setPlatforms([]);
+                                                setRating(0);
+                                                setHoursPlayed("");
+                                            } else if (
+                                                opt.value === "PLAYING"
+                                            ) {
+                                                setRating(0);
+                                            }
+                                        }}
                                         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all cursor-pointer border ${
                                             status === opt.value
                                                 ? "bg-primary/20 border-primary/30"
@@ -451,12 +463,18 @@ export default function AddGameLogModal({
                             </div>
                         </div>
 
-                        {/* Platform */}
-                        <div className="space-y-2">
-                            <Label>Platform Played On</Label>
-                            <div className="flex flex-wrap gap-2">
-                                {getValidPlatforms(selectedGame.platforms).map(
-                                    (p) => {
+                        {/* Platform - only for Playing & Completed */}
+                        {status !== "PLAN_TO_PLAY" && (
+                            <div className="space-y-2">
+                                <Label>
+                                    {status === "PLAYING"
+                                        ? "Platform Playing On"
+                                        : "Platform Played On"}
+                                </Label>
+                                <div className="flex flex-wrap gap-2">
+                                    {getValidPlatforms(
+                                        selectedGame.platforms,
+                                    ).map((p) => {
                                         const isSelected =
                                             platforms.includes(p);
                                         return (
@@ -482,53 +500,65 @@ export default function AddGameLogModal({
                                                 {p}
                                             </button>
                                         );
-                                    },
-                                )}
+                                    })}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
-                        {/* Rating */}
-                        <div className="space-y-2">
-                            <Label>Rating (1-10)</Label>
-                            <div className="flex items-center gap-1">
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                                    <button
-                                        key={n}
-                                        onClick={() =>
-                                            setRating(rating === n ? 0 : n)
-                                        }
-                                        className="cursor-pointer transition-transform hover:scale-110"
-                                    >
-                                        <Star
-                                            className={`h-6 w-6 ${
-                                                n <= rating
-                                                    ? "fill-yellow-400 text-yellow-400"
-                                                    : "text-muted-foreground/30"
-                                            }`}
-                                        />
-                                    </button>
-                                ))}
-                                {rating > 0 && (
-                                    <span className="ml-2 text-sm font-medium text-muted-foreground">
-                                        {rating}/10
-                                    </span>
-                                )}
+                        {/* Rating - only for Completed */}
+                        {status === "COMPLETED" && (
+                            <div className="space-y-2">
+                                <Label>Rating (1-10)</Label>
+                                <div className="flex items-center gap-1">
+                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
+                                        (n) => (
+                                            <button
+                                                key={n}
+                                                onClick={() =>
+                                                    setRating(
+                                                        rating === n ? 0 : n,
+                                                    )
+                                                }
+                                                className="cursor-pointer transition-transform hover:scale-110"
+                                            >
+                                                <Star
+                                                    className={`h-6 w-6 ${
+                                                        n <= rating
+                                                            ? "fill-yellow-400 text-yellow-400"
+                                                            : "text-muted-foreground/30"
+                                                    }`}
+                                                />
+                                            </button>
+                                        ),
+                                    )}
+                                    {rating > 0 && (
+                                        <span className="ml-2 text-sm font-medium text-muted-foreground">
+                                            {rating}/10
+                                        </span>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
-                        {/* Hours Played */}
-                        <div className="space-y-2">
-                            <Label htmlFor="hoursPlayed">Hours Played</Label>
-                            <Input
-                                id="hoursPlayed"
-                                type="number"
-                                min="0"
-                                step="0.5"
-                                placeholder="0"
-                                value={hoursPlayed}
-                                onChange={(e) => setHoursPlayed(e.target.value)}
-                            />
-                        </div>
+                        {/* Hours Played - only for Playing & Completed */}
+                        {status !== "PLAN_TO_PLAY" && (
+                            <div className="space-y-2">
+                                <Label htmlFor="hoursPlayed">
+                                    Hours Played
+                                </Label>
+                                <Input
+                                    id="hoursPlayed"
+                                    type="number"
+                                    min="0"
+                                    step="0.5"
+                                    placeholder="0"
+                                    value={hoursPlayed}
+                                    onChange={(e) =>
+                                        setHoursPlayed(e.target.value)
+                                    }
+                                />
+                            </div>
+                        )}
 
                         {/* Notes */}
                         <div className="space-y-2">
