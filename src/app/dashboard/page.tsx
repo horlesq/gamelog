@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import StatsOverview from "@/components/features/StatsOverview";
 import DashboardControls from "@/components/features/DashboardControls";
@@ -11,9 +11,11 @@ import Navbar, { NavbarRef } from "@/components/layout/Navbar";
 import GameCard from "@/components/features/GameCard";
 import GameList from "@/components/features/GameList";
 import AddGameLogModal from "@/components/features/AddGameLogModal";
-import { GameLog, Stats } from "@/types/game";
+import { GameLog, Stats, CustomFilter } from "@/types/game";
 import { getGameLogs, deleteGameLog } from "@/lib/client/game-logs";
+import { getCustomFilters } from "@/lib/client/custom-filters";
 import toast from "react-hot-toast";
+import { parseStringArray } from "@/lib/utils";
 
 export default function DashboardPage() {
     const [gameLogs, setGameLogs] = useState<GameLog[]>([]);
@@ -31,13 +33,25 @@ export default function DashboardPage() {
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [editingLog, setEditingLog] = useState<GameLog | null>(null);
+    const [customFilters, setCustomFilters] = useState<CustomFilter[]>([]);
+    const [activeFilterId, setActiveFilterId] = useState<string | null>(null);
     const router = useRouter();
     const navbarRef = useRef<NavbarRef>(null);
 
     useEffect(() => {
         fetchGameLogs();
+        fetchCustomFilters();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search, statusFilter]);
+
+    const fetchCustomFilters = async () => {
+        try {
+            const data = await getCustomFilters();
+            setCustomFilters(data.filters);
+        } catch (error) {
+            console.error("Error fetching custom filters:", error);
+        }
+    };
 
     const fetchGameLogs = async () => {
         try {
@@ -111,6 +125,63 @@ export default function DashboardPage() {
         }
     });
 
+    // Apply custom filter conditions
+    const activeFilter = customFilters.find((f) => f.id === activeFilterId);
+
+    const filteredGameLogs = activeFilter
+        ? sortedGameLogs.filter((log) => {
+              const c = activeFilter.conditions;
+
+              if (c.status && log.status !== c.status) return false;
+
+              if (c.genres && c.genres.length > 0) {
+                  const gameGenres = parseStringArray(log.game.genres || "");
+                  if (!c.genres.some((g) => gameGenres.includes(g)))
+                      return false;
+              }
+
+              if (c.platforms && c.platforms.length > 0) {
+                  const gamePlatforms = parseStringArray(
+                      log.game.platforms || "",
+                  );
+                  if (!c.platforms.some((p) => gamePlatforms.includes(p)))
+                      return false;
+              }
+
+              if (
+                  c.ratingMin !== undefined &&
+                  (log.rating === undefined ||
+                      log.rating === null ||
+                      log.rating < c.ratingMin)
+              )
+                  return false;
+              if (
+                  c.ratingMax !== undefined &&
+                  (log.rating === undefined ||
+                      log.rating === null ||
+                      log.rating > c.ratingMax)
+              )
+                  return false;
+
+              if (
+                  c.hoursMin !== undefined &&
+                  (log.hoursPlayed === undefined ||
+                      log.hoursPlayed === null ||
+                      log.hoursPlayed < c.hoursMin)
+              )
+                  return false;
+              if (
+                  c.hoursMax !== undefined &&
+                  (log.hoursPlayed === undefined ||
+                      log.hoursPlayed === null ||
+                      log.hoursPlayed > c.hoursMax)
+              )
+                  return false;
+
+              return true;
+          })
+        : sortedGameLogs;
+
     if (loading) {
         return (
             <div className="min-h-screen bg-background">
@@ -168,10 +239,13 @@ export default function DashboardPage() {
                     setSortDirection={setSortDirection}
                     viewMode={viewMode}
                     setViewMode={setViewMode}
+                    customFilters={customFilters}
+                    activeFilterId={activeFilterId}
+                    setActiveFilterId={setActiveFilterId}
                 />
 
                 {/* Game Content */}
-                {sortedGameLogs.length === 0 ? (
+                {filteredGameLogs.length === 0 ? (
                     <EmptyState
                         search={search}
                         statusFilter={statusFilter}
@@ -179,7 +253,7 @@ export default function DashboardPage() {
                     />
                 ) : viewMode === "grid" ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                        {sortedGameLogs.map((gameLog) => (
+                        {filteredGameLogs.map((gameLog) => (
                             <GameCard
                                 key={gameLog.id}
                                 gameLog={gameLog}
@@ -190,7 +264,7 @@ export default function DashboardPage() {
                     </div>
                 ) : (
                     <GameList
-                        gameLogs={sortedGameLogs}
+                        gameLogs={filteredGameLogs}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                     />

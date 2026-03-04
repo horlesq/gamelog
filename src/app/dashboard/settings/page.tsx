@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User as UserIcon, Users, Shield } from "lucide-react";
+import { User as UserIcon, Users, Shield, Filter } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import { User } from "@/types/user";
 import { useUpdate } from "@/contexts/UpdateContext";
@@ -10,6 +10,7 @@ import { getCurrentUser } from "@/lib/auth/client";
 import ProfileSettings from "@/components/features/settings/ProfileSettings";
 import UserManagement from "@/components/features/settings/UserManagement";
 import VersionSettings from "@/components/features/settings/VersionSettings";
+import CustomFiltersSettings from "@/components/features/settings/CustomFiltersSettings";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SettingsPage() {
@@ -113,6 +114,17 @@ export default function SettingsPage() {
                             <UserIcon className="h-4 w-4" />
                             <span>Profile</span>
                         </button>
+                        <button
+                            onClick={() => setActiveTab("filters")}
+                            className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-md transition-colors whitespace-nowrap ${
+                                activeTab === "filters"
+                                    ? "bg-card shadow-sm text-foreground"
+                                    : "text-muted-foreground hover:text-foreground"
+                            }`}
+                        >
+                            <Filter className="h-4 w-4" />
+                            <span>Custom Filters</span>
+                        </button>
                         {currentUser?.isAdmin && (
                             <>
                                 <button
@@ -162,6 +174,8 @@ export default function SettingsPage() {
                     {currentUser?.isAdmin && activeTab === "users" && (
                         <UserManagement currentUser={currentUser} />
                     )}
+
+                    {activeTab === "filters" && <CustomFiltersSettings />}
 
                     {currentUser?.isAdmin && activeTab === "version" && (
                         <VersionSettings />

@@ -9,7 +9,7 @@ export default function VersionSettings() {
                 <h2 className="text-xl font-semibold text-foreground">
                     Version Information
                 </h2>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground mt-1">
                     Check for updates and manage system version
                 </p>
             </div>

@@ -17,3 +17,22 @@ export const statusColors: Record<string, string> = {
 export const formatStatus = (status: string) => {
     return status.replace(/_/g, " ");
 };
+
+/**
+ * Parse a stored genres/platforms string — handles both JSON arrays
+ * (e.g. '["Action","RPG"]') and plain comma-separated strings.
+ */
+export function parseStringArray(value: string): string[] {
+    try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) {
+            return parsed.map((s: string) => String(s).trim()).filter(Boolean);
+        }
+    } catch {
+        // Not JSON — fall through to comma-split
+    }
+    return value
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+}

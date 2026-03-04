@@ -8,14 +8,15 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  password  String
-  name      String?
-  isAdmin   Boolean   @default(false)
-  gameLogs  GameLog[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            String         @id @default(cuid())
+  email         String         @unique
+  password      String
+  name          String?
+  isAdmin       Boolean        @default(false)
+  gameLogs      GameLog[]
+  customFilters CustomFilter[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@map("users")
 }
@@ -63,4 +64,18 @@ enum GameStatus {
   PLAN_TO_PLAY
   PLAYING
   COMPLETED
+}
+
+model CustomFilter {
+  id         String   @id @default(cuid())
+  name       String
+  icon       String   @default("filter")
+  color      String   @default("purple")
+  conditions String   // JSON: { status?, genres?, platforms?, ratingMin?, ratingMax?, hoursMin?, hoursMax? }
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("custom_filters")
 }

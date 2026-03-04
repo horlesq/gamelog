@@ -84,3 +84,24 @@ export interface RAWGSearchResponse {
     previous: string | null;
     results: RAWGGame[];
 }
+
+export interface FilterConditions {
+    status?: GameStatus;
+    genres?: string[];
+    platforms?: string[];
+    ratingMin?: number;
+    ratingMax?: number;
+    hoursMin?: number;
+    hoursMax?: number;
+}
+
+export interface CustomFilter {
+    id: string;
+    name: string;
+    icon: string;
+    color: string;
+    conditions: FilterConditions;
+    userId: string;
+    createdAt: string;
+    updatedAt: string;
+}
