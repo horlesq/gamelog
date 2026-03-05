@@ -10,6 +10,7 @@ export interface Game {
     metacritic?: number;
     genres?: string;
     platforms?: string;
+    developers?: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -46,6 +47,7 @@ export interface CreateGameLogData {
     gameMetacritic?: number;
     gameGenres?: string;
     gamePlatforms?: string;
+    gameDevelopers?: string;
     status: GameStatus;
     rating?: number;
     hoursPlayed?: number;
@@ -75,6 +77,7 @@ export interface RAWGGame {
     rating: number;
     genres: { id: number; name: string }[];
     platforms: { platform: { id: number; name: string } }[];
+    developers?: { id: number; name: string }[];
     short_screenshots?: { id: number; image: string }[];
 }
 

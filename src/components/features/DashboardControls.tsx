@@ -214,25 +214,24 @@ export default function DashboardControls({
     );
 
     return (
-        <div className="flex flex-col xl:flex-row gap-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-2 mb-6">
             {hasFilters ? (
                 <>
                     {/* Top Row on Mobile / Left Section on Desktop */}
-                    <div className="flex flex-col sm:flex-row gap-4 flex-1">
+                    <div className="flex flex-col sm:flex-row gap-2 flex-1">
                         {SearchInput}
-                        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                            {SortControls}
-                        </div>
+                        <div className="block sm:hidden">{SortControls}</div>
                     </div>
 
                     {/* Bottom Row on Mobile / Right Section on Desktop */}
-                    <div className="flex flex-row gap-2 w-full xl:w-auto">
+                    <div className="flex flex-row gap-2 w-full md:w-auto">
+                        <div className="hidden sm:block">{SortControls}</div>
                         {FilterControls}
                         {ViewModeControls}
                     </div>
                 </>
             ) : (
-                <div className="flex flex-col sm:flex-row gap-4 flex-1 w-full">
+                <div className="flex flex-col sm:flex-row gap-2 flex-1 w-full">
                     {SearchInput}
                     <div className="flex flex-row gap-2 w-full sm:w-auto">
                         {SortControls}

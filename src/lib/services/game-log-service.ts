@@ -60,6 +60,7 @@ export class GameLogService {
                     metacritic: data.gameMetacritic,
                     genres: data.gameGenres,
                     platforms: data.gamePlatforms,
+                    developers: data.gameDevelopers,
                 },
             });
         }

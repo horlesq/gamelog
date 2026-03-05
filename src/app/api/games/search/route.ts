@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
             rating: game.rating,
             genres: game.genres?.map((g) => g.name) || [],
             platforms: game.platforms?.map((p) => p.platform.name) || [],
+            developers: game.developers?.map((d) => d.name) || [],
         }));
 
         return NextResponse.json({

@@ -31,6 +31,7 @@ interface GameSearchResult {
     rating: number;
     genres: string[];
     platforms: string[];
+    developers: string[];
 }
 
 interface AddGameLogModalProps {
@@ -154,6 +155,9 @@ export default function AddGameLogModal({
                 platforms: editData.game.platforms
                     ? JSON.parse(editData.game.platforms)
                     : [],
+                developers: editData.game.developers
+                    ? JSON.parse(editData.game.developers)
+                    : [],
             });
         } else {
             resetForm();
@@ -233,6 +237,7 @@ export default function AddGameLogModal({
                     gameMetacritic: selectedGame.metacritic || undefined,
                     gameGenres: JSON.stringify(selectedGame.genres),
                     gamePlatforms: JSON.stringify(selectedGame.platforms),
+                    gameDevelopers: JSON.stringify(selectedGame.developers),
                     status,
                     platforms:
                         platforms.length > 0

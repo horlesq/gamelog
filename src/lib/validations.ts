@@ -14,6 +14,7 @@ export const gameLogSchema = z.object({
     gameMetacritic: z.number().int().optional(),
     gameGenres: z.string().optional(),
     gamePlatforms: z.string().optional(),
+    gameDevelopers: z.string().optional(),
     status: z
         .enum(["PLAN_TO_PLAY", "PLAYING", "COMPLETED"])
         .default("PLAN_TO_PLAY"),
