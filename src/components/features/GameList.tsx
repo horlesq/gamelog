@@ -2,7 +2,14 @@
 
 import { GameLog } from "@/types/game";
 import { Badge } from "@/components/ui/badge";
-import { Star, Clock, Calendar, Pencil, Trash2 } from "lucide-react";
+import {
+    Star,
+    Clock,
+    Calendar,
+    Pencil,
+    Trash2,
+    ExternalLink,
+} from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
@@ -168,6 +175,25 @@ export default function GameList({
                                     </td>
                                     <td className="p-4 align-middle text-right">
                                         <div className="flex items-center justify-end gap-2">
+                                            {gameLog.game.slug && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    asChild
+                                                    className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                                >
+                                                    <a
+                                                        href={`https://rawg.io/games/${gameLog.game.slug}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        <ExternalLink className="h-4 w-4" />
+                                                        <span className="sr-only">
+                                                            View on RAWG
+                                                        </span>
+                                                    </a>
+                                                </Button>
+                                            )}
                                             <Button
                                                 variant="ghost"
                                                 size="icon"

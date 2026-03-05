@@ -303,22 +303,22 @@ export default function CustomFiltersSettings() {
                                     key={filter.id}
                                     className="flex items-center justify-between p-4 rounded-xl bg-background/50 group"
                                 >
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3 min-w-0 flex-1 mr-4">
                                         <div
-                                            className={`w-3 h-3 rounded-full ${getColorClass(filter.color)}`}
+                                            className={`w-3 h-3 shrink-0 rounded-full ${getColorClass(filter.color)}`}
                                         />
-                                        <div>
-                                            <p className="font-medium text-sm text-foreground">
+                                        <div className="min-w-0">
+                                            <p className="font-medium text-sm text-foreground truncate">
                                                 {filter.name}
                                             </p>
-                                            <p className="text-xs text-muted-foreground">
+                                            <p className="text-xs text-muted-foreground truncate">
                                                 {getConditionSummary(
                                                     filter.conditions,
                                                 )}
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                    <div className="flex shrink-0 gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                         <button
                                             onClick={() => startEdit(filter)}
                                             className="p-1.5 rounded-lg hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"

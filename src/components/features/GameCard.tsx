@@ -2,7 +2,14 @@
 
 import { GameLog } from "@/types/game";
 import { Badge } from "@/components/ui/badge";
-import { Star, Clock, Gamepad2, Trash2, Pencil } from "lucide-react";
+import {
+    Star,
+    Clock,
+    Gamepad2,
+    Trash2,
+    Pencil,
+    ExternalLink,
+} from "lucide-react";
 
 interface GameCardProps {
     gameLog: GameLog;
@@ -77,6 +84,18 @@ export default function GameCard({ gameLog, onEdit, onDelete }: GameCardProps) {
 
                 {/* Action buttons */}
                 <div className="absolute bottom-3 right-3 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 z-10">
+                    {game.slug && (
+                        <a
+                            href={`https://rawg.io/games/${game.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white transition-colors cursor-pointer"
+                            title="View on RAWG"
+                        >
+                            <ExternalLink className="h-4 w-4 pointer-events-none" />
+                        </a>
+                    )}
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
