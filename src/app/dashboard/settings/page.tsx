@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User as UserIcon, Users, Shield, Filter } from "lucide-react";
+import {
+    User as UserIcon,
+    Users,
+    Shield,
+    Filter,
+    Database,
+} from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import { User } from "@/types/user";
 import { useUpdate } from "@/contexts/UpdateContext";
@@ -11,6 +17,7 @@ import ProfileSettings from "@/components/features/settings/ProfileSettings";
 import UserManagement from "@/components/features/settings/UserManagement";
 import VersionSettings from "@/components/features/settings/VersionSettings";
 import CustomFiltersSettings from "@/components/features/settings/CustomFiltersSettings";
+import DataManagement from "@/components/features/settings/DataManagement";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SettingsPage() {
@@ -125,6 +132,17 @@ export default function SettingsPage() {
                             <Filter className="h-4 w-4" />
                             <span>Custom Filters</span>
                         </button>
+                        <button
+                            onClick={() => setActiveTab("data")}
+                            className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-md transition-colors whitespace-nowrap ${
+                                activeTab === "data"
+                                    ? "bg-card shadow-sm text-foreground"
+                                    : "text-muted-foreground hover:text-foreground"
+                            }`}
+                        >
+                            <Database className="h-4 w-4" />
+                            <span>Data</span>
+                        </button>
                         {currentUser?.isAdmin && (
                             <>
                                 <button
@@ -176,6 +194,8 @@ export default function SettingsPage() {
                     )}
 
                     {activeTab === "filters" && <CustomFiltersSettings />}
+
+                    {activeTab === "data" && <DataManagement />}
 
                     {currentUser?.isAdmin && activeTab === "version" && (
                         <VersionSettings />
