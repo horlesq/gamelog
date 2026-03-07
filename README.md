@@ -10,6 +10,10 @@ Track your gaming journey - log games you've played and plan to play.
 - **Status Management**: Track progress (Plan to Play, Playing, Completed)
 - **Ratings & Notes**: Rate your games and keep personal notes
 - **Platform Tracking**: Log which platform you played on (PC, PS5, Switch, etc.)
+- **AI Suggestions**: Get personalized game recommendations on what to play next
+- **Analytics**: Comprehensive charts and insights
+- **Custom Filters**: Create and save custom filters
+- **Data Management**: Import and export your game library as CSV
 - **Easy Self-hosting**: Docker-ready with SQLite database
 - **RAWG Integration**: Access metadata for over 500,000+ games
 
@@ -131,11 +135,12 @@ The app will auto-generate a `.env` file with all necessary settings on first st
 
 ### Environment Variables
 
-| Variable       | Description               | Default                   |
-| -------------- | ------------------------- | ------------------------- |
-| `JWT_SECRET`   | Secret key for JWT tokens | Auto-generated on startup |
-| `DATABASE_URL` | Database file path        | `file:./data/gamelog.db`  |
-| `RAWG_API_KEY` | RAWG API Key              | Required for game search  |
+| Variable       | Description               | Default                     |
+| -------------- | ------------------------- | --------------------------- |
+| `JWT_SECRET`   | Secret key for JWT tokens | Auto-generated on startup   |
+| `DATABASE_URL` | Database file path        | `file:./data/gamelog.db`    |
+| `RAWG_API_KEY` | RAWG API Key              | Required for game search    |
+| `GROQ_API_KEY` | Groq API Key              | Required for AI suggestions |
 
 **Note**: JWT_SECRET and DATABASE_URL variables are auto-configured on first startup. You can customize them by editing the generated `.env` file.
 
@@ -182,3 +187,5 @@ For issues and feature requests, please use the GitHub Issues tab.
 ---
 
 **Built with**: Next.js, TypeScript, Tailwind CSS, Prisma, SQLite
+
+**Project inspired by**: https://github.com/LaszloRobert/projectshelf

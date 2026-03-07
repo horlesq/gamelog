@@ -42,17 +42,19 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-background py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
             <Card className="w-full max-w-sm sm:max-w-md">
-                <CardHeader className="space-y-1 px-4 sm:px-6">
-                    <CardTitle className="text-xl sm:text-2xl text-center flex items-center justify-center gap-2">
+                <CardHeader className="space-y-1 px-4 sm:px-6 text-center">
+                    <CardTitle className="text-2xl sm:text-3xl  flex items-center justify-center gap-3">
                         <Image
                             src="/3d/next.png"
                             alt="GameLog"
-                            width={40}
-                            height={40}
+                            width={48}
+                            height={48}
                             priority
-                            className="w-10 h-10 object-contain"
+                            className="w-12 h-12 object-contain"
                         />
-                        <span>GameLog</span>
+                        <span className="font-extrabold tracking-tight text-foreground">
+                            GameLog
+                        </span>
                     </CardTitle>
                     <CardDescription className="text-center text-sm sm:text-base">
                         Sign in to track your gaming journey
