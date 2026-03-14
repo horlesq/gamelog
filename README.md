@@ -1,5 +1,8 @@
 # GameLog
 
+[![Release](https://img.shields.io/github/release/horlesq/gamelog.svg)](https://github.com/horlesq/gamelog/releases)
+[![Docker Hub](https://img.shields.io/badge/dockerhub-horlesq/gamelog-0db7ed?logo=docker)](https://hub.docker.com/r/horlesq/gamelog)
+
 Track your gaming journey - log games you've played and plan to play.
 
 <img width="1467" height="839" alt="image" src="https://github.com/user-attachments/assets/cd0e6ea0-d32c-46f9-be8d-23d7a0209447" />
