@@ -138,7 +138,7 @@ export default function SimpleUpdateNotification({
                                             : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                                     }
                                 >
-                                    v{latestVersion}
+                                    {latestVersion}
                                 </Badge>
                             )}
                         </div>

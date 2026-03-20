@@ -17,9 +17,6 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
-# Build the application
-RUN npm run build
-
 # Create data directory
 RUN mkdir -p /app/data
 
@@ -27,6 +24,9 @@ RUN mkdir -p /app/data
 ENV PORT=3000
 ENV DATABASE_URL="file:/app/data/gamelog.db"
 EXPOSE $PORT
+
+# Build the application
+RUN npm run build
 
 # Start the application
 CMD ["sh", "-c", "npx prisma db push && npm start"]
