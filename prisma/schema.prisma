@@ -15,6 +15,7 @@ model User {
   isAdmin       Boolean        @default(false)
   gameLogs      GameLog[]
   customFilters CustomFilter[]
+  ignoredGames  IgnoredGame[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
@@ -79,4 +80,15 @@ model CustomFilter {
   updatedAt  DateTime @updatedAt
 
   @@map("custom_filters")
+}
+
+model IgnoredGame {
+  id        String   @id @default(cuid())
+  gameName  String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([gameName, userId])
+  @@map("ignored_games")
 }

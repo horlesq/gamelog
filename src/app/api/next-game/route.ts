@@ -54,6 +54,7 @@ export async function POST(request: Request) {
         });
 
         const completedLogs = gameLogs.filter((l) => l.status === "COMPLETED");
+        const playingLogs = gameLogs.filter((l) => l.status === "PLAYING");
 
         if (completedLogs.length === 0) {
             return NextResponse.json(
@@ -64,17 +65,30 @@ export async function POST(request: Request) {
             );
         }
 
+        // Fetch user's explicitly ignored/disliked games from DB
+        const ignoredGames = await prisma.ignoredGame.findMany({
+            where: { userId: user.userId },
+            select: { gameName: true },
+        });
+
         // Collect all game names to exclude from suggestions
         const allGameNames = [
             ...gameLogs.map((l) => l.game.name),
+            ...ignoredGames.map((ig) => ig.gameName),
             ...excludeNames,
         ];
+
+        // Lowercase set for fast comparison during post-filtering
+        const excludedNamesLower = new Set(
+            allGameNames.map((n) => n.toLowerCase()),
+        );
 
         // Build gaming profile based on completed games only
         const genreCounts: Record<string, number> = {};
         const platformCounts: Record<string, number> = {};
-        const ratings: number[] = [];
-        const completedGames: string[] = [];
+        const lovedGames: string[] = []; // rated 8-10
+        const likedGames: string[] = []; // rated 5-7
+        const mixedGames: string[] = []; // rated 1-4 or unrated
 
         completedLogs.forEach((log) => {
             if (log.game.genres) {
@@ -91,13 +105,22 @@ export async function POST(request: Request) {
                 });
             }
 
-            if (log.rating) {
-                ratings.push(log.rating);
-            }
+            const detail = [
+                log.game.name,
+                log.rating ? `rated ${log.rating}/10` : null,
+                log.hoursPlayed ? `${log.hoursPlayed}h played` : null,
+                log.notes ? `notes: "${log.notes.slice(0, 120)}"` : null,
+            ]
+                .filter(Boolean)
+                .join(" — ");
 
-            completedGames.push(
-                `${log.game.name}${log.rating ? ` (rated ${log.rating}/10)` : ""}`,
-            );
+            if (log.rating && log.rating >= 8) {
+                lovedGames.push(detail);
+            } else if (log.rating && log.rating >= 5) {
+                likedGames.push(detail);
+            } else {
+                mixedGames.push(detail);
+            }
         });
 
         const topGenres = Object.entries(genreCounts)
@@ -110,47 +133,92 @@ export async function POST(request: Request) {
             .slice(0, 3)
             .map(([name]) => name);
 
-        const avgRating =
-            ratings.length > 0
-                ? Math.round(
-                      (ratings.reduce((a, b) => a + b, 0) / ratings.length) *
-                          10,
-                  ) / 10
-                : null;
+        // Currently playing context
+        const currentlyPlaying = playingLogs.map((l) => l.game.name);
 
-        // Build the prompt
-        const prompt = `You are a game recommendation expert. Based on the following completed games and their ratings, suggest exactly 4 new games for the user.
-        
-        **CRITICAL:** In the "reason" field, address the user directly using "You", "Your", etc. (e.g., "Since you enjoyed...", "You might like..."). Do NOT use third-person phrases like "The user".
+        // Inject randomness: pick a random exploration angle each time
+        // This forces the LLM to explore different parts of its knowledge
+        const explorationAngles = [
+            "Focus on indie games and hidden gems from small studios that match their taste.",
+            "Focus on critically acclaimed AAA titles they might have missed.",
+            "Focus on games from the last 3 years that match their preferences.",
+            "Focus on classic games (pre-2015) that are considered timeless masterpieces in their favorite genres.",
+            "Focus on games with exceptional storytelling and narrative depth.",
+            "Focus on games with unique or innovative gameplay mechanics.",
+            "Focus on games from Japanese developers or studios outside the Western mainstream.",
+            "Focus on games that are underrated or overlooked but highly praised by niche communities.",
+            "Focus on games with strong multiplayer or co-op experiences.",
+            "Focus on games with atmospheric world-building and immersive environments.",
+            "Focus on games that won major awards (GOTY, BAFTA, TGA) in their favorite genres.",
+            "Focus on games from Eastern European or other non-mainstream development studios.",
+        ];
+        const randomAngle =
+            explorationAngles[
+                Math.floor(Math.random() * explorationAngles.length)
+            ];
+        const randomSeed = Math.floor(Math.random() * 100000);
 
-## Completed Games
+        // Reframe exclusions positively: "you've already recommended these"
+        const previouslyRecommended =
+            excludeNames.length > 0
+                ? `\n## Already Recommended (DO NOT repeat these)\nYou have already recommended these in previous sessions, so suggest COMPLETELY DIFFERENT games:\n${excludeNames.join(", ")}`
+                : "";
+        // Build the prompt — ask for 12 to have a large buffer for post-filtering
+        const prompt = `Based on the user's gaming history below, suggest exactly 12 NEW and UNIQUE games they would love.
 
-${completedGames.join("\n")}
+**CRITICAL:** Address the user directly ("You", "Your"). Do NOT use "The user".
 
-## Preferences
+## Games They LOVED (rated 8-10)
+${lovedGames.length > 0 ? lovedGames.join("\n") : "None yet"}
 
-**Top genres:** ${topGenres.join(", ") || "varied"}
+## Games They Liked (rated 5-7)
+${likedGames.length > 0 ? likedGames.join("\n") : "None yet"}
+
+## Games They Had Mixed Feelings About (rated 1-4 or unrated)
+${mixedGames.length > 0 ? mixedGames.join("\n") : "None yet"}
+${currentlyPlaying.length > 0 ? `\n## Currently Playing\n${currentlyPlaying.join("\n")}` : ""}
+${previouslyRecommended}
+
+## Taste Profile
+**Favorite genres:** ${topGenres.join(", ") || "varied"}
 **Preferred platforms:** ${topPlatforms.join(", ") || "various"}
-**Average rating given:** ${avgRating ? `${avgRating}/10` : "no ratings yet"}
+
+## Special Direction for THIS Session
+${randomAngle}
+(Session seed: ${randomSeed} — use this to vary your picks)
 
 ## Rules
 - Suggest only real, existing games
-- Do NOT suggest any of these games (already in library): ${allGameNames.join(", ")}
-- Focus on games similar to the ones the user rated highly
-- Match their genre and platform preferences
-- Mix well-known titles with hidden gems
-- Each suggestion should have a specific, personalized reason referencing the completed games, addressing the user directly.
+- NEVER suggest any game the user already owns or that appears in the "Already Recommended" list above
+- Prioritize games similar to those they LOVED — match the specific qualities they enjoyed (narrative style, mechanics, atmosphere, difficulty)
+- If they wrote notes about a game, use those insights to understand what they value
+- Each suggestion must be a UNIQUE game not from the same franchise as another suggestion
+- Each suggestion must have a specific reason referencing their actual completed games
+- Be creative and surprising — dig deep into your knowledge of gaming
 
-Respond with ONLY a valid JSON array, no markdown, no extra text. Each object must have "name" (the exact game title) and "reason" (1-2 sentences explaining why this game fits your taste, addressing you directly):
-[{"name": "Game Title", "reason": "Because you enjoyed..."}, ...]`;
+Respond with a JSON object containing a "suggestions" array. Each object in the array must have "name" (exact game title) and "reason" (1-2 sentences):
+{
+  "suggestions": [
+    {"name": "Game Title", "reason": "Because you enjoyed..."},
+    ...
+  ]
+}`;
 
-        // Call Groq API
+        // Call Groq API with system message for better role adherence
         const groq = new Groq({ apiKey: groqApiKey });
         const chatCompletion = await groq.chat.completions.create({
-            messages: [{ role: "user", content: prompt }],
+            messages: [
+                {
+                    role: "system",
+                    content:
+                        "You are a game recommendation expert with encyclopedic knowledge of video games across all eras, genres, and platforms. You pride yourself on surprising users with unexpected but perfectly matched recommendations. Never repeat yourself — always find fresh suggestions. You MUST respond with valid JSON.",
+                },
+                { role: "user", content: prompt },
+            ],
             model: "llama-3.3-70b-versatile",
-            temperature: 0.8,
-            max_completion_tokens: 1024,
+            temperature: 1.0,
+            max_completion_tokens: 2048,
+            response_format: { type: "json_object" },
         });
 
         const content = chatCompletion.choices[0]?.message?.content;
@@ -162,14 +230,12 @@ Respond with ONLY a valid JSON array, no markdown, no extra text. Each object mu
         }
 
         // Parse the JSON response
-        let suggestions: AiSuggestion[];
+        let aiResponse: { suggestions: AiSuggestion[] };
         try {
-            // Strip potential markdown code fences
-            const cleaned = content
-                .replace(/```json\s*/g, "")
-                .replace(/```\s*/g, "")
-                .trim();
-            suggestions = JSON.parse(cleaned);
+            aiResponse = JSON.parse(content);
+            if (!Array.isArray(aiResponse.suggestions)) {
+                throw new Error("Invalid response format");
+            }
         } catch {
             console.error("Failed to parse AI response:", content);
             return NextResponse.json(
@@ -180,9 +246,17 @@ Respond with ONLY a valid JSON array, no markdown, no extra text. Each object mu
             );
         }
 
-        // Enrich each suggestion with RAWG data
+        const rawSuggestions = aiResponse.suggestions;
+
+        // Server-side post-filter: programmatically remove any suggestion
+        // that matches the exclusion list (LLMs often ignore negative constraints)
+        const filteredSuggestions = rawSuggestions.filter(
+            (s) => !excludedNamesLower.has(s.name.toLowerCase()),
+        );
+
+        // Enrich each suggestion with RAWG data (take top 4 after filtering)
         const enrichedSuggestions: EnrichedSuggestion[] = await Promise.all(
-            suggestions.slice(0, 4).map(async (suggestion) => {
+            filteredSuggestions.slice(0, 4).map(async (suggestion) => {
                 try {
                     const rawgResults = await searchGames(suggestion.name, 1);
                     const match = rawgResults.results[0];

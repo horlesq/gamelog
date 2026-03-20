@@ -14,6 +14,7 @@ import {
     saveExcludedNames,
     loadAddedIds,
     saveAddedIds,
+    clearHistory,
 } from "@/lib/client/next-game";
 import { createGameLog, getGameLogs } from "@/lib/client/game-logs";
 import toast from "react-hot-toast";
@@ -139,6 +140,13 @@ export default function AiSuggestPage() {
         }
     };
 
+    const handleResetHistory = () => {
+        clearHistory();
+        setSuggestions([]);
+        setHasGenerated(false);
+        toast.success("Recommendation history cleared!");
+    };
+
     return (
         <div className="min-h-screen bg-background">
             <Navbar />
@@ -163,22 +171,34 @@ export default function AiSuggestPage() {
                             </span>
                         </div>
                     ) : (
-                        <Button
-                            onClick={handleGenerate}
-                            variant="default"
-                            className="space-x-2 shrink-0 w-full sm:w-auto"
-                        >
-                            {hasGenerated ? (
-                                <RefreshCw className="size-4" />
-                            ) : (
-                                <Sparkles className="size-4" />
+                        <div className="flex gap-2 w-full sm:w-auto">
+                            {hasGenerated && (
+                                <Button
+                                    onClick={handleResetHistory}
+                                    variant="outline"
+                                    size="sm"
+                                    className="shrink-0"
+                                >
+                                    Reset History
+                                </Button>
                             )}
-                            <span>
-                                {hasGenerated
-                                    ? "Suggest Again"
-                                    : "Get Suggestions"}
-                            </span>
-                        </Button>
+                            <Button
+                                onClick={handleGenerate}
+                                variant="default"
+                                className="space-x-2 shrink-0 w-full sm:w-auto"
+                            >
+                                {hasGenerated ? (
+                                    <RefreshCw className="size-4" />
+                                ) : (
+                                    <Sparkles className="size-4" />
+                                )}
+                                <span>
+                                    {hasGenerated
+                                        ? "Suggest Again"
+                                        : "Get Suggestions"}
+                                </span>
+                            </Button>
+                        </div>
                     )}
                 </div>
 
