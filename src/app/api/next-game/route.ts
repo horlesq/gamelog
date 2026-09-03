@@ -164,7 +164,7 @@ export async function POST(request: Request) {
                 ? `\n## Already Recommended (DO NOT repeat these)\nYou have already recommended these in previous sessions, so suggest COMPLETELY DIFFERENT games:\n${excludeNames.join(", ")}`
                 : "";
         // Build the prompt — ask for 12 to have a large buffer for post-filtering
-        const prompt = `Based on the user's gaming history below, suggest exactly 12 NEW and UNIQUE games they would love.
+        const prompt = `Based on the user's gaming history below, suggest exactly 6 NEW and UNIQUE games they would love.
 
 **CRITICAL:** Address the user directly ("You", "Your"). Do NOT use "The user".
 
@@ -215,13 +215,18 @@ Respond with a JSON object containing a "suggestions" array. Each object in the 
                 },
                 { role: "user", content: prompt },
             ],
-            model: "llama-3.3-70b-versatile",
+            model: "openai/gpt-oss-120b",
             temperature: 1.0,
-            max_completion_tokens: 2048,
-            response_format: { type: "json_object" },
+            max_tokens: 2048,
         });
 
-        const content = chatCompletion.choices[0]?.message?.content;
+        let content = chatCompletion.choices[0]?.message?.content;
+        if (content) {
+            const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+            if (jsonMatch && jsonMatch[1]) {
+                content = jsonMatch[1];
+            }
+        }
         if (!content) {
             return NextResponse.json(
                 { error: "AI did not return a response. Please try again." },

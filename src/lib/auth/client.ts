@@ -54,8 +54,16 @@ export async function loginUser(credentials: { email: string; password: string }
   })
 
   if (!response.ok) {
-    const errorData = await response.json()
-    throw new Error(errorData.error || 'Login failed')
+    const contentType = response.headers.get('content-type')
+    if (contentType && contentType.includes('application/json')) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Login failed')
+    }
+    // Server returned a non-JSON response (e.g. crash/HTML error page)
+    if (response.status >= 500) {
+      throw new Error('Server error - the database may not be set up. Run "prisma generate" and "prisma db push", then restart the dev server.')
+    }
+    throw new Error('Login failed')
   }
 
   return response.json()

@@ -185,12 +185,13 @@ export default function AiSuggestPage() {
                             <Button
                                 onClick={handleGenerate}
                                 variant="default"
-                                className="space-x-2 shrink-0 w-full sm:w-auto"
+                                className="space-x-2 min-w-0 flex-1 sm:flex-none"
+                                disabled={loading}
                             >
                                 {hasGenerated ? (
-                                    <RefreshCw className="size-4" />
+                                    <RefreshCw className="size-4 shrink-0" />
                                 ) : (
-                                    <Sparkles className="size-4" />
+                                    <Sparkles className="size-4 shrink-0" />
                                 )}
                                 <span>
                                     {hasGenerated
